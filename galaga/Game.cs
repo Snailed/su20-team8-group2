@@ -52,7 +52,13 @@ public class Game : IGameEventProcessor<object> {
             if (gameTimer.ShouldRender()) {
                 win.Clear();
                 // Render gameplay entities here
+                // Render player object
                 player.Entity.RenderEntity();
+                // Render all enemy objects
+                foreach (var enemy in enemies)
+                {
+                    enemy.Image.Render(enemy.Shape);
+                }
                 win.SwapBuffers();
             }
 
@@ -112,9 +118,10 @@ public class Game : IGameEventProcessor<object> {
         {
             enemies.Add(new Enemy(
                 new DynamicShape(
-                    new Vec2F(i*0.01f, 0.8f), 
+                    // The +0.2f is for centering purposes
+                    new Vec2F(i*0.1f + 0.2f, 0.9f), 
                     new Vec2F(0.1f, 0.1f)),
-                enemyStrides[0]));
+                new ImageStride(80, enemyStrides)));
         }
     }
 }
