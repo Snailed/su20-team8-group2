@@ -27,7 +27,10 @@ namespace galaga {
             DynamicShape shape = Entity.Shape.AsDynamicShape();
             float x = shape.Position.X + shape.Direction.X;
             float y = shape.Position.Y + shape.Direction.Y;
-            if (x > 0 && x < 1 && y > 0 && y < 1) Entity.Shape.Move();
+            if (x > 0 && x < 1)
+            {
+                if (x + shape.Extent.X < 1 && y + shape.Extent.Y < 1) Entity.Shape.Move();
+            }
         }
     }
 }

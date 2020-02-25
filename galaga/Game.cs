@@ -16,11 +16,18 @@ public class Game : IGameEventProcessor<object> {
     private readonly Player player;
     private readonly GameEventBus<object> eventBus;
 
+    private List<Image> enemyStrides;
+    private List<Enemy> enemies;
+
     public Game() {
         win = new Window("Galaga", 500, 500);
         gameTimer = new GameTimer(60, 60);
         player = new Player(new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.1f, 0.1f)),
             new Image(Path.Combine("Assets", "Images", "Player.png")));
+        enemyStrides = ImageStride.CreateStrides(4,
+            Path.Combine("Assets", "Images", "BlueMonster.png"));
+        enemies = new List<Enemy>();
+        AddEnemies();
         eventBus = new GameEventBus<object>();
         eventBus.InitializeEventBus(new List<GameEventType> {
             GameEventType.InputEvent,
@@ -37,6 +44,7 @@ public class Game : IGameEventProcessor<object> {
             while (gameTimer.ShouldUpdate()) {
                 win.PollEvents();
                 // Update game logic here 
+                player.Move();
                 eventBus.ProcessEvents();
             }
 
@@ -60,11 +68,24 @@ public class Game : IGameEventProcessor<object> {
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.WindowEvent, this,
                         "CLOSE_WINDOW", "", ""));
                 break;
+            case "KEY_H":
+                player.Direction(new Vec2F(-0.01f, 0.0f));
+                break;
+            case "KEY_L" :
+                player.Direction(new Vec2F(0.01f, 0.0f));
+                break;
         }
     }
 
     public void KeyRelease(string key) {
-        throw new NotImplementedException();
+        switch (key) {
+            case "KEY_H":
+                player.Direction(new Vec2F(0.0f, 0.0f));
+                break;
+            case "KEY_L" :
+                player.Direction(new Vec2F(0.0f, 0.0f));
+                break;
+        }
     }
 
     public void ProcessEvent(GameEventType eventType, GameEvent<object> gameEvent) {
@@ -83,5 +104,17 @@ public class Game : IGameEventProcessor<object> {
                     KeyRelease(gameEvent.Message);
                     break;
             }
+    }
+
+    private void AddEnemies()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            enemies.Add(new Enemy(
+                new DynamicShape(
+                    new Vec2F(i*0.01f, 0.8f), 
+                    new Vec2F(0.1f, 0.1f)),
+                enemyStrides[0]));
+        }
     }
 }
