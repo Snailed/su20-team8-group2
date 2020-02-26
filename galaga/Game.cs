@@ -15,12 +15,14 @@ public class Game : IGameEventProcessor<object> {
     private readonly GameTimer gameTimer;
     private readonly Player player;
     private readonly GameEventBus<object> eventBus;
+    private readonly Score score;
 
     public Game() {
         win = new Window("Galaga", 500, 500);
         gameTimer = new GameTimer(60, 60);
         player = new Player(new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.1f, 0.1f)),
             new Image(Path.Combine("Assets", "Images", "Player.png")));
+        score = new Score(new Vec2F(0.0f, 0.95f), new Vec2F(0.3f, 0.1f));
         eventBus = new GameEventBus<object>();
         eventBus.InitializeEventBus(new List<GameEventType> {
             GameEventType.InputEvent,
@@ -45,6 +47,7 @@ public class Game : IGameEventProcessor<object> {
                 win.Clear();
                 // Render gameplay entities here
                 player.Entity.RenderEntity();
+                score.RenderScore();
                 win.SwapBuffers();
             }
 
