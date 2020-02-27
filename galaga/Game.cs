@@ -76,7 +76,6 @@ public class Game : IGameEventProcessor<object> {
                 {
                     enemy.Image.Render(enemy.Shape);
                 }
->>>>>>> 5ca5a5b3d102747dc586a630e6d96dbe826c1190
                 win.SwapBuffers();
             }
 
