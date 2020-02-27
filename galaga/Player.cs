@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DIKUArcade.Entities;
 using DIKUArcade.EventBus;
 using DIKUArcade.Graphics;

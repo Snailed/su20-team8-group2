@@ -19,6 +19,9 @@ public class Game : IGameEventProcessor<object> {
     private List<Image> enemyStrides;
     private List<Enemy> enemies;
 
+    private List<PlayerShot> playerShots;
+    
+
     public Game() {
         win = new Window("Galaga", 500, 500);
         gameTimer = new GameTimer(60, 60);
@@ -36,6 +39,7 @@ public class Game : IGameEventProcessor<object> {
         win.RegisterEventBus(eventBus);
         eventBus.Subscribe(GameEventType.InputEvent, this);
         eventBus.Subscribe(GameEventType.WindowEvent, this);
+        playerShots = new List<PlayerShot>();
     }
 
     public void GameLoop() {
@@ -45,6 +49,12 @@ public class Game : IGameEventProcessor<object> {
                 win.PollEvents();
                 // Update game logic here 
                 player.Move();
+
+                foreach (var shot in playerShots)
+                {
+                    shot.Shape.Move();
+                }
+                
                 eventBus.ProcessEvents();
             }
 
@@ -53,6 +63,11 @@ public class Game : IGameEventProcessor<object> {
                 win.Clear();
                 // Render gameplay entities here
                 player.Entity.RenderEntity();
+
+                foreach (var shot in playerShots)
+                {
+                    shot.Image.Render(shot.Shape);
+                } 
                 win.SwapBuffers();
             }
 
@@ -74,6 +89,16 @@ public class Game : IGameEventProcessor<object> {
             case "KEY_L" :
                 player.Direction(new Vec2F(0.01f, 0.0f));
                 break;
+            case "KEY_SPACE":
+                playerShots.Add(new PlayerShot(
+                    new DynamicShape(
+                        new Vec2F(player.Entity.Shape.Position.X +0.05f, player.Entity.Shape.Position.Y + 0.1f),
+                        new Vec2F(0.008f, 0.027f),
+                        new Vec2F(0.0f, 0.01f)
+                    ),
+                    new Image("Assets/Images/BulletRed2.png")));
+                break;
+                
         }
     }
 
@@ -85,6 +110,7 @@ public class Game : IGameEventProcessor<object> {
             case "KEY_L" :
                 player.Direction(new Vec2F(0.0f, 0.0f));
                 break;
+            
         }
     }
 
