@@ -22,8 +22,11 @@ public class Game : IGameEventProcessor<object> {
     private List<Enemy> enemies;
 
     private List<PlayerShot> playerShots;
-    
 
+    private List<Image> explosionStrides;
+    private AnimationContainer explosions;
+    private int explosiveLength = 500;
+    
     public Game() {
         win = new Window("Galaga", 500, 500);
         gameTimer = new GameTimer(60, 60);
@@ -42,6 +45,8 @@ public class Game : IGameEventProcessor<object> {
         eventBus.Subscribe(GameEventType.InputEvent, this);
         eventBus.Subscribe(GameEventType.WindowEvent, this);
         playerShots = new List<PlayerShot>();
+        explosionStrides = ImageStride.CreateStrides(8, Path.Combine("Assets", "Images", "Explosion.png"));
+        explosions = new AnimationContainer(60);
     }
 
     public void GameLoop() {
@@ -64,8 +69,7 @@ public class Game : IGameEventProcessor<object> {
                 // Render gameplay entities here
                 // Render player object
                 player.Entity.RenderEntity();
-                
-                // Renders all the shots in the PlayerShots list
+
                 foreach (var shot in playerShots)
                 {
                     shot.Image.Render(shot.Shape);
@@ -75,6 +79,7 @@ public class Game : IGameEventProcessor<object> {
                 {
                     enemy.Image.Render(enemy.Shape);
                 }
+                explosions.RenderAnimations();
                 win.SwapBuffers();
             }
 
@@ -151,7 +156,7 @@ public class Game : IGameEventProcessor<object> {
                 new ImageStride(80, enemyStrides)));
         }
     }
-
+    
     public void IterateShot()
     {
         foreach (var shot in playerShots)
@@ -168,8 +173,10 @@ public class Game : IGameEventProcessor<object> {
                     var collision = CollisionDetection.Aabb(shot.Shape.AsDynamicShape(),  enemy.Shape);
                     if (collision.Collision)
                     {
+                        AddExplosion(enemy.Shape.Position.X, enemy.Shape.Position.Y, enemy.Shape.Extent.X, enemy.Shape.Extent.Y);
                         enemy.DeleteEntity();
                         shot.DeleteEntity();
+                        
                         Console.WriteLine("hit");
                     }
                 }
@@ -193,5 +200,12 @@ public class Game : IGameEventProcessor<object> {
             }
         }
         playerShots = newPlayerShots;
+    }
+
+    public void AddExplosion(float posX, float posY, float extentX, float extentY)
+    {
+        explosions.AddAnimation(new StationaryShape(posX, posY, extentX, extentY), explosiveLength,
+            new ImageStride(explosiveLength / 8, explosionStrides));
+        
     }
 }
