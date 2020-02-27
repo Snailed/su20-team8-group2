@@ -6,6 +6,7 @@ using DIKUArcade.Entities;
 using DIKUArcade.EventBus;
 using DIKUArcade.Graphics;
 using DIKUArcade.Math;
+using DIKUArcade.Physics;
 using DIKUArcade.Timers;
 using galaga;
 
@@ -15,7 +16,8 @@ public class Game : IGameEventProcessor<object> {
     private readonly GameTimer gameTimer;
     private readonly Player player;
     private readonly GameEventBus<object> eventBus;
-
+    
+    
     private List<Image> enemyStrides;
     private List<Enemy> enemies;
 
@@ -49,11 +51,9 @@ public class Game : IGameEventProcessor<object> {
                 win.PollEvents();
                 // Update game logic here 
                 player.Move();
-
-                foreach (var shot in playerShots)
-                {
-                    shot.Shape.Move();
-                }
+                
+                // Moves the shot
+                IterateShot();
                 
                 eventBus.ProcessEvents();
             }
@@ -64,7 +64,8 @@ public class Game : IGameEventProcessor<object> {
                 // Render gameplay entities here
                 // Render player object
                 player.Entity.RenderEntity();
-
+                
+                // Renders all the shots in the PlayerShots list
                 foreach (var shot in playerShots)
                 {
                     shot.Image.Render(shot.Shape);
@@ -149,5 +150,48 @@ public class Game : IGameEventProcessor<object> {
                     new Vec2F(0.1f, 0.1f)),
                 new ImageStride(80, enemyStrides)));
         }
+    }
+
+    public void IterateShot()
+    {
+        foreach (var shot in playerShots)
+        {
+            shot.Shape.Move();
+            if (shot.Shape.Position.Y > 1.0f )
+            {
+                shot.DeleteEntity();
+            }
+            else
+            {
+                foreach (var enemy in enemies)
+                {
+                    var collision = CollisionDetection.Aabb(shot.Shape.AsDynamicShape(),  enemy.Shape);
+                    if (collision.Collision)
+                    {
+                        enemy.DeleteEntity();
+                        shot.DeleteEntity();
+                        Console.WriteLine("hit");
+                    }
+                }
+            }
+        }
+        List<Enemy> newEnemies = new List<Enemy>();
+        foreach (var enemy in enemies)
+        {
+            if (!enemy.IsDeleted())
+            {
+                newEnemies.Add(enemy);
+            }                       
+        }
+        enemies = newEnemies;
+        List<PlayerShot> newPlayerShots = new List<PlayerShot>();
+        foreach (var shot in playerShots)
+        {
+            if (!shot.IsDeleted())
+            {
+                newPlayerShots.Add(shot);
+            }
+        }
+        playerShots = newPlayerShots;
     }
 }
