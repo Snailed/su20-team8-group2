@@ -64,13 +64,13 @@ public class Game : IGameEventProcessor<object> {
                 // Render gameplay entities here
                 // Render player object
                 player.Entity.RenderEntity();
-                
-                // Renders all the shots in the PlayerShots list
+
                 foreach (var shot in playerShots)
                 {
                     shot.Image.Render(shot.Shape);
                 } 
-                // Render all enemy objects
+
+              // Render all enemy objects
                 foreach (var enemy in enemies)
                 {
                     enemy.Image.Render(enemy.Shape);
