@@ -33,7 +33,7 @@ public class Game : IGameEventProcessor<object> {
         gameTimer = new GameTimer(60, 60);
         player = new Player(new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.1f, 0.1f)),
             new Image(Path.Combine("Assets", "Images", "Player.png")));
-        score = new Score(new Vec2F(0.0f, 0.95f), new Vec2F(0.3f, 0.1f));
+        score = new Score(new Vec2F(0.02f, 0.7f), new Vec2F(0.3f, 0.3f));
         enemyStrides = ImageStride.CreateStrides(4,
             Path.Combine("Assets", "Images", "BlueMonster.png"));
         enemies = new List<Enemy>();
@@ -180,8 +180,7 @@ public class Game : IGameEventProcessor<object> {
                         AddExplosion(enemy.Shape.Position.X, enemy.Shape.Position.Y, enemy.Shape.Extent.X, enemy.Shape.Extent.Y);
                         enemy.DeleteEntity();
                         shot.DeleteEntity();
-                        
-                        Console.WriteLine("hit");
+                        score.AddPoint(1);
                     }
                 }
             }
