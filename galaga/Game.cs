@@ -20,6 +20,7 @@ public class Game : IGameEventProcessor<object> {
     
     private List<Image> enemyStrides;
     private List<Enemy> enemies;
+    private readonly Score score;
 
     private List<PlayerShot> playerShots;
 
@@ -32,6 +33,7 @@ public class Game : IGameEventProcessor<object> {
         gameTimer = new GameTimer(60, 60);
         player = new Player(new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.1f, 0.1f)),
             new Image(Path.Combine("Assets", "Images", "Player.png")));
+        score = new Score(new Vec2F(0.0f, 0.95f), new Vec2F(0.3f, 0.1f));
         enemyStrides = ImageStride.CreateStrides(4,
             Path.Combine("Assets", "Images", "BlueMonster.png"));
         enemies = new List<Enemy>();
@@ -69,6 +71,7 @@ public class Game : IGameEventProcessor<object> {
                 // Render gameplay entities here
                 // Render player object
                 player.Entity.RenderEntity();
+                score.RenderScore();
 
                 foreach (var shot in playerShots)
                 {
