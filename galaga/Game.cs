@@ -48,7 +48,8 @@ public class Game : IGameEventProcessor<object> {
         eventBus.Subscribe(GameEventType.WindowEvent, this);
         playerShots = new List<PlayerShot>();
         explosionStrides = ImageStride.CreateStrides(8, Path.Combine("Assets", "Images", "Explosion.png"));
-        explosions = new AnimationContainer(60);
+        // Her the constructor is given the argument 6 since that is the total amount of enemies.
+        explosions = new AnimationContainer(6);
     }
 
     public void GameLoop() {
