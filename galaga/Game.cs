@@ -20,6 +20,7 @@ public class Game : IGameEventProcessor<object> {
     
     private List<Image> enemyStrides;
     private List<Enemy> enemies;
+    private readonly Score score;
 
     private List<PlayerShot> playerShots;
 
@@ -34,6 +35,7 @@ public class Game : IGameEventProcessor<object> {
         gameTimer = new GameTimer(60, 60);
         player = new Player(new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.1f, 0.1f)),
             new Image(Path.Combine("Assets", "Images", "Player.png")));
+        score = new Score(new Vec2F(0.02f, 0.7f), new Vec2F(0.3f, 0.3f));
         enemyStrides = ImageStride.CreateStrides(4,
             Path.Combine("Assets", "Images", "BlueMonster.png"));
         enemies = new List<Enemy>();
@@ -51,8 +53,12 @@ public class Game : IGameEventProcessor<object> {
         // Preloads the bullet image
         bullet = new Image(Path.Combine("Assets", "Images", "BulletRed2.png"));
         explosionStrides = ImageStride.CreateStrides(8, Path.Combine("Assets", "Images", "Explosion.png"));
+<<<<<<< HEAD
         
         // Her the constructor is given the argument 6 since that is the total amount of enemies.  
+=======
+        // Her the constructor is given the argument 6 since that is the total amount of enemies.
+>>>>>>> 50c83beb1d01035a0a9365e20549c39c41c22e51
         explosions = new AnimationContainer(6);
     }
 
@@ -76,12 +82,14 @@ public class Game : IGameEventProcessor<object> {
                 // Render gameplay entities here
                 // Render player object
                 player.Entity.RenderEntity();
+                score.RenderScore();
 
                 foreach (var shot in playerShots)
                 {
                     shot.Image.Render(shot.Shape);
                 } 
-                // Render all enemy objects
+
+              // Render all enemy objects
                 foreach (var enemy in enemies)
                 {
                     enemy.Image.Render(enemy.Shape);
@@ -183,8 +191,7 @@ public class Game : IGameEventProcessor<object> {
                         AddExplosion(enemy.Shape.Position.X, enemy.Shape.Position.Y, enemy.Shape.Extent.X, enemy.Shape.Extent.Y);
                         enemy.DeleteEntity();
                         shot.DeleteEntity();
-                        
-                        Console.WriteLine("hit");
+                        score.AddPoint(1);
                     }
                 }
             }
