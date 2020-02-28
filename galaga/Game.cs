@@ -26,6 +26,8 @@ public class Game : IGameEventProcessor<object> {
     private List<Image> explosionStrides;
     private AnimationContainer explosions;
     private int explosiveLength = 500;
+
+    private Image bullet;
     
     public Game() {
         win = new Window("Galaga", 500, 500);
@@ -45,8 +47,11 @@ public class Game : IGameEventProcessor<object> {
         eventBus.Subscribe(GameEventType.InputEvent, this);
         eventBus.Subscribe(GameEventType.WindowEvent, this);
         playerShots = new List<PlayerShot>();
+        bullet = new Image(Path.Combine("Assets", "Images", "BulletRed2.png"));
         explosionStrides = ImageStride.CreateStrides(8, Path.Combine("Assets", "Images", "Explosion.png"));
-        explosions = new AnimationContainer(60);
+        
+        // Her the constructor is given the argument 6 since that is the total amount of enemies.  
+        explosions = new AnimationContainer(6);
     }
 
     public void GameLoop() {
@@ -108,7 +113,7 @@ public class Game : IGameEventProcessor<object> {
                         new Vec2F(0.008f, 0.027f),
                         new Vec2F(0.0f, 0.01f)
                     ),
-                    new Image("Assets/Images/BulletRed2.png")));
+                    bullet));
                 break;
                 
         }
