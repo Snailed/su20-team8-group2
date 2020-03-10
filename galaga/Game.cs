@@ -53,12 +53,7 @@ public class Game : IGameEventProcessor<object> {
         // Preloads the bullet image
         bullet = new Image(Path.Combine("Assets", "Images", "BulletRed2.png"));
         explosionStrides = ImageStride.CreateStrides(8, Path.Combine("Assets", "Images", "Explosion.png"));
-<<<<<<< HEAD
-        
-        // Her the constructor is given the argument 6 since that is the total amount of enemies.  
-=======
-        // Her the constructor is given the argument 6 since that is the total amount of enemies.
->>>>>>> 50c83beb1d01035a0a9365e20549c39c41c22e51
+        // Here the constructor is given the argument 6 since that is the total amount of enemies.  
         explosions = new AnimationContainer(6);
     }
 
