@@ -8,6 +8,7 @@ namespace galaga {
     public class Player : IGameEventProcessor<object> {
         private IBaseImage image;
         private DynamicShape shape;
+        private readonly GameEventBus<object> eventBus;
         public Entity Entity { get; private set;}
 
         public Player(DynamicShape shape, IBaseImage image) {
@@ -17,10 +18,25 @@ namespace galaga {
         }
 
         public void ProcessEvent(GameEventType eventType, GameEvent<object> gameEvent) {
-            throw new System.NotImplementedException();
+            System.Console.WriteLine("Process registered");
+            if (eventType == GameEventType.MovementEvent)
+            {
+                switch (gameEvent.Message)
+                {
+                    case "MOVE_RIGHT":
+                        this.Direction(new Vec2F(-0.01f, 0.0f));
+                        break;
+                    case "MOVE_LEFT":
+                        this.Direction(new Vec2F(0.01f, 0.0f));
+                        break;
+                    case "MOVE_STOP":
+                        this.Direction(new Vec2F(0.0f, 0.0f));
+                        break;
+                }
+            }
         }
 
-        public void Direction(Vec2F vec) {
+         private void Direction(Vec2F vec) {
             Entity.Shape.AsDynamicShape().Direction = vec;
         }
 
