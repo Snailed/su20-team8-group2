@@ -48,6 +48,7 @@ public class Game : IGameEventProcessor<object> {
         win.RegisterEventBus(eventBus);
         eventBus.Subscribe(GameEventType.InputEvent, this);
         eventBus.Subscribe(GameEventType.WindowEvent, this);
+        
         playerShots = new List<PlayerShot>();
         // Preloads the bullet image
         bullet = new Image(Path.Combine("Assets", "Images", "BulletRed2.png"));
