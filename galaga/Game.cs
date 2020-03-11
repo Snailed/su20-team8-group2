@@ -9,6 +9,7 @@ using DIKUArcade.Math;
 using DIKUArcade.Physics;
 using DIKUArcade.Timers;
 using galaga;
+using galaga.Squadron;
 
 public class Game : IGameEventProcessor<object> {
     private readonly Window win;
@@ -170,14 +171,10 @@ public class Game : IGameEventProcessor<object> {
 
     private void AddEnemies()
     {
-        for (int i = 0; i < 6; i++)
-        {
-            enemies.Add(new Enemy(
-                new DynamicShape(
-                    // The +0.2f is for centering purposes
-                    new Vec2F(i*0.1f + 0.2f, 0.9f), 
-                    new Vec2F(0.1f, 0.1f)),
-                new ImageStride(80, enemyStrides)));
+        SquiggleSquadron squiggleSquadron = new SquiggleSquadron(6);
+        squiggleSquadron.CreateEnemies(enemyStrides);
+        foreach (Enemy enemy in squiggleSquadron.Enemies) {
+            enemies.Add(enemy);
         }
     }
     
