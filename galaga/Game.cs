@@ -43,12 +43,14 @@ public class Game : IGameEventProcessor<object> {
         eventBus = new GameEventBus<object>();
         eventBus.InitializeEventBus(new List<GameEventType> {
             GameEventType.InputEvent,
-            GameEventType.WindowEvent
+            GameEventType.WindowEvent,
+            GameEventType.MovementEvent
         });
         win.RegisterEventBus(eventBus);
         eventBus.Subscribe(GameEventType.InputEvent, this);
         eventBus.Subscribe(GameEventType.WindowEvent, this);
-        
+        eventBus.Subscribe(GameEventType.MovementEvent, player);
+
         playerShots = new List<PlayerShot>();
         // Preloads the bullet image
         bullet = new Image(Path.Combine("Assets", "Images", "BulletRed2.png"));
@@ -106,10 +108,16 @@ public class Game : IGameEventProcessor<object> {
                         "CLOSE_WINDOW", "", ""));
                 break;
             case "KEY_H":
-                player.Direction(new Vec2F(-0.01f, 0.0f));
+                // player.Direction(new Vec2F(-0.01f, 0.0f));
+                eventBus.RegisterEvent(
+                    GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
+                        "MOVE_RIGHT", "", ""));
                 break;
             case "KEY_L" :
-                player.Direction(new Vec2F(0.01f, 0.0f));
+                // player.Direction(new Vec2F(0.01f, 0.0f));
+                eventBus.RegisterEvent(
+                    GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
+                        "MOVE_LEFT", "", ""));
                 break;
             case "KEY_SPACE":
                 playerShots.Add(new PlayerShot(
@@ -127,10 +135,16 @@ public class Game : IGameEventProcessor<object> {
     public void KeyRelease(string key) {
         switch (key) {
             case "KEY_H":
-                player.Direction(new Vec2F(0.0f, 0.0f));
+                // player.Direction(new Vec2F(0.0f, 0.0f));
+                eventBus.RegisterEvent(
+                    GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
+                        "MOVE_STOP", "", ""));
                 break;
             case "KEY_L" :
-                player.Direction(new Vec2F(0.0f, 0.0f));
+                // player.Direction(new Vec2F(0.0f, 0.0f));
+                eventBus.RegisterEvent(
+                    GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
+                        "MOVE_STOP", "", ""));
                 break;
             
         }
