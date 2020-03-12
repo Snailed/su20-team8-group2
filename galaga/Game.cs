@@ -38,8 +38,12 @@ public class Game : IGameEventProcessor<object> {
     
     
     private Image bullet;
+
+    private bool isGameOver;
     
-    public Game() {
+    public Game()
+    {
+        isGameOver = false;
         win = new Window("Galaga", 500, 500);
         gameTimer = new GameTimer(60, 60);
         player = new Player(new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.1f, 0.1f)),
@@ -59,12 +63,14 @@ public class Game : IGameEventProcessor<object> {
         eventBus.InitializeEventBus(new List<GameEventType> {
             GameEventType.InputEvent,
             GameEventType.WindowEvent,
-            GameEventType.MovementEvent
+            GameEventType.MovementEvent,
+            GameEventType.StatusEvent
         });
         win.RegisterEventBus(eventBus);
         eventBus.Subscribe(GameEventType.InputEvent, this);
         eventBus.Subscribe(GameEventType.WindowEvent, this);
         eventBus.Subscribe(GameEventType.MovementEvent, player);
+        eventBus.Subscribe(GameEventType.StatusEvent, this);
 
         playerShots = new List<PlayerShot>();
         // Preloads the bullet image
@@ -81,6 +87,14 @@ public class Game : IGameEventProcessor<object> {
                 win.PollEvents();
                 // Update game logic here 
                 player.Move();
+                
+                // Check if enemy has won
+                squiggleSquadron.Enemies.Iterate(checkIfEnemyHasWon);
+                
+                // See if difficulty should be increased
+                if (!isGameOver && squiggleSquadron.Enemies.CountEntities() <= 0)
+                    AddEnemies();
+                    
                 
                 // Moves the shot
                 IterateShot();
@@ -104,13 +118,13 @@ public class Game : IGameEventProcessor<object> {
               // Render all enemy objects
               zigZagDown.MoveEnemies(squiggleSquadron.Enemies);
               squiggleSquadron.Enemies.RenderEntities();
+              
               /*
               foreach (var enemy in enemies)
                 {
                     enemy.Image.Render(enemy.Shape);
                 }
                 */
-                
                 explosions.RenderAnimations();
                 win.SwapBuffers();
             }
@@ -186,6 +200,26 @@ public class Game : IGameEventProcessor<object> {
                     KeyRelease(gameEvent.Message);
                     break;
             }
+        else if (eventType == GameEventType.StatusEvent && gameEvent.Message == "GAME_OVER")
+            GameOver();
+    }
+
+    private void checkIfEnemyHasWon(Enemy enemy)
+    {
+        if (enemy.Shape.Position.Y <= 0)
+        {
+            eventBus.RegisterEvent(
+                GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.StatusEvent, this,
+                    "GAME_OVER", "", ""));
+        }
+    }
+
+    private void GameOver()
+    {
+        isGameOver = true;
+        squiggleSquadron.Enemies.ClearContainer();
+        playerShots.Clear();
+        player.Entity.DeleteEntity();
     }
 
     private void AddEnemies()
