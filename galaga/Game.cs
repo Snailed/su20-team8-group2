@@ -34,6 +34,8 @@ public class Game : IGameEventProcessor<object> {
 
     private NoMove noMove;
     private Down down;
+    private ZigZagDown zigZagDown;
+    
     
     private Image bullet;
     
@@ -51,6 +53,7 @@ public class Game : IGameEventProcessor<object> {
         
          noMove = new NoMove();
          down = new Down();
+         zigZagDown = new ZigZagDown();
          
         eventBus = new GameEventBus<object>();
         eventBus.InitializeEventBus(new List<GameEventType> {
@@ -99,8 +102,7 @@ public class Game : IGameEventProcessor<object> {
                 } 
                 
               // Render all enemy objects
-              down.MoveEnemies(squiggleSquadron.Enemies);
-              
+              zigZagDown.MoveEnemies(squiggleSquadron.Enemies);
               squiggleSquadron.Enemies.RenderEntities();
               /*
               foreach (var enemy in enemies)
