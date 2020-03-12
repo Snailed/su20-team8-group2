@@ -9,15 +9,21 @@ namespace galaga.MovementStrategy
     public class Down : IMovementStrategy
 
     {
-        public Down() {}
+        private float speed;
+
+        public Down()
+        {
+            speed = 1.0f;}
         public void MoveEnemy(Enemy enemy)
         {
-            enemy.Shape.MoveY(-0.001f);
+            enemy.Shape.MoveY(-0.001f*speed);
         }
         
         public void MoveEnemies(EntityContainer<Enemy> enemies)
         {
             enemies.Iterate(MoveEnemy);
         }
+
+        public void IncreaseSpeedBy(float s) {this.speed += s;}
     }
 }

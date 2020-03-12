@@ -16,5 +16,7 @@ namespace galaga.MovementStrategy
         {
             enemies.Iterate(MoveEnemy);
         }
+
+        public void IncreaseSpeedBy(float speed){}
     }
 }

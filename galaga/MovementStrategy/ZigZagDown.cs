@@ -6,13 +6,15 @@ namespace galaga.MovementStrategy
 {
     public class ZigZagDown : IMovementStrategy
     {
+        private float speed;
+
+        public ZigZagDown() {speed = 0.0003f;}
         public void MoveEnemy(Enemy enemy)
         {
-            float s = 0.0003f;
             float p = 0.045f;
             float a = 0.05f;
             Vec2F start = enemy.startPos;
-            float yi = enemy.Shape.Position.Y - s;
+            float yi = enemy.Shape.Position.Y - speed;
             var xi = start.X + a * Math.Sin((2*Math.PI * (start.Y - yi)) / p);
 
             enemy.Shape.SetPosition(new Vec2F((float)xi, yi));
@@ -22,5 +24,7 @@ namespace galaga.MovementStrategy
         {
             enemies.Iterate(MoveEnemy);
         }
+
+        public void IncreaseSpeedBy(float s) {this.speed += s;}
     }
 }

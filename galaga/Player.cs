@@ -18,7 +18,6 @@ namespace galaga {
         }
 
         public void ProcessEvent(GameEventType eventType, GameEvent<object> gameEvent) {
-            System.Console.WriteLine("Process registered");
             if (eventType == GameEventType.MovementEvent)
             {
                 switch (gameEvent.Message)

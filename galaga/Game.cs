@@ -21,7 +21,6 @@ public class Game : IGameEventProcessor<object> {
     
     
     private List<Image> enemyStrides;
-    //private List<Enemy> enemies;
     private readonly Score score;
 
     private List<PlayerShot> playerShots;
@@ -51,7 +50,6 @@ public class Game : IGameEventProcessor<object> {
         score = new Score(new Vec2F(0.02f, 0.7f), new Vec2F(0.3f, 0.3f));
         enemyStrides = ImageStride.CreateStrides(4,
             Path.Combine("Assets", "Images", "BlueMonster.png"));
-        //enemies = new List<Enemy>();
         squiggleSquadron = new SquiggleSquadron(6);
         AddEnemies();
         
@@ -89,12 +87,14 @@ public class Game : IGameEventProcessor<object> {
                 player.Move();
                 
                 // Check if enemy has won
-                squiggleSquadron.Enemies.Iterate(checkIfEnemyHasWon);
+                squiggleSquadron.Enemies.Iterate(CheckIfEnemyHasWon);
                 
-                // See if difficulty should be increased
+                // See if difficulty should be increased and enemies created
                 if (!isGameOver && squiggleSquadron.Enemies.CountEntities() <= 0)
+                {
+                    zigZagDown.IncreaseSpeedBy(0.0001f);
                     AddEnemies();
-                    
+                }
                 
                 // Moves the shot
                 IterateShot();
@@ -106,8 +106,9 @@ public class Game : IGameEventProcessor<object> {
             if (gameTimer.ShouldRender()) {
                 win.Clear();
                 // Render gameplay entities here
-                // Render player object
-                player.Entity.RenderEntity();
+                // Render player object if game is not over
+                if (!isGameOver)
+                    player.Entity.RenderEntity();
                 score.RenderScore();
 
                 foreach (var shot in playerShots)
@@ -119,14 +120,8 @@ public class Game : IGameEventProcessor<object> {
               zigZagDown.MoveEnemies(squiggleSquadron.Enemies);
               squiggleSquadron.Enemies.RenderEntities();
               
-              /*
-              foreach (var enemy in enemies)
-                {
-                    enemy.Image.Render(enemy.Shape);
-                }
-                */
-                explosions.RenderAnimations();
-                win.SwapBuffers();
+              explosions.RenderAnimations();
+              win.SwapBuffers();
             }
 
             if (gameTimer.ShouldReset()) // 1 second has passed - display last captured ups and fps
@@ -142,13 +137,11 @@ public class Game : IGameEventProcessor<object> {
                         "CLOSE_WINDOW", "", ""));
                 break;
             case "KEY_H":
-                // player.Direction(new Vec2F(-0.01f, 0.0f));
                 eventBus.RegisterEvent(
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
                         "MOVE_RIGHT", "", ""));
                 break;
             case "KEY_L" :
-                // player.Direction(new Vec2F(0.01f, 0.0f));
                 eventBus.RegisterEvent(
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
                         "MOVE_LEFT", "", ""));
@@ -169,13 +162,11 @@ public class Game : IGameEventProcessor<object> {
     public void KeyRelease(string key) {
         switch (key) {
             case "KEY_H":
-                // player.Direction(new Vec2F(0.0f, 0.0f));
                 eventBus.RegisterEvent(
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
                         "MOVE_STOP", "", ""));
                 break;
             case "KEY_L" :
-                // player.Direction(new Vec2F(0.0f, 0.0f));
                 eventBus.RegisterEvent(
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
                         "MOVE_STOP", "", ""));
@@ -204,7 +195,9 @@ public class Game : IGameEventProcessor<object> {
             GameOver();
     }
 
-    private void checkIfEnemyHasWon(Enemy enemy)
+    // Check if enemy has won by checking if enemy input
+    // has reached the bottom of the screen, Position.Y <= 0
+    private void CheckIfEnemyHasWon(Enemy enemy)
     {
         if (enemy.Shape.Position.Y <= 0)
         {
@@ -217,20 +210,15 @@ public class Game : IGameEventProcessor<object> {
     private void GameOver()
     {
         isGameOver = true;
+        // Remove all objects in squiggleSquadron and playerShots
+        // so that none are rendered
         squiggleSquadron.Enemies.ClearContainer();
         playerShots.Clear();
-        player.Entity.DeleteEntity();
     }
 
     private void AddEnemies()
     {
-        //SquiggleSquadron squiggleSquadron = new SquiggleSquadron(6);
         squiggleSquadron.CreateEnemies(enemyStrides);
-        /*
-        foreach (Enemy enemy in squiggleSquadron.Enemies) {
-            enemies.Add(enemy);
-        }
-        */
     }
     
     public void IterateShot()
@@ -257,18 +245,6 @@ public class Game : IGameEventProcessor<object> {
                 }
             }
         }
-        
-        /*
-        List<Enemy> newEnemies = new List<Enemy>();
-        foreach (var enemy in enemies)
-        {
-            if (!enemy.IsDeleted())
-            {
-                newEnemies.Add(enemy);
-            }                       
-        }
-        enemies = newEnemies;
-        */
         
         List<PlayerShot> newPlayerShots = new List<PlayerShot>();
         foreach (var shot in playerShots)

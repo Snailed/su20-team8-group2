@@ -9,5 +9,6 @@ namespace galaga.MovementStrategy
     {
         void MoveEnemy(Enemy enemy);
         void MoveEnemies(EntityContainer<Enemy> enemies);
+        void IncreaseSpeedBy(float speed);
     }
 }
