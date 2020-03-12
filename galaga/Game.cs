@@ -10,6 +10,7 @@ using DIKUArcade.Physics;
 using DIKUArcade.Timers;
 using galaga;
 using galaga.Squadron;
+using galaga.MovementStrategy;
 
 public class Game : IGameEventProcessor<object> {
     private readonly Window win;
@@ -20,15 +21,20 @@ public class Game : IGameEventProcessor<object> {
     
     
     private List<Image> enemyStrides;
-    private List<Enemy> enemies;
+    //private List<Enemy> enemies;
     private readonly Score score;
 
     private List<PlayerShot> playerShots;
 
+    private SquiggleSquadron squiggleSquadron;
+    
     private List<Image> explosionStrides;
     private AnimationContainer explosions;
     private int explosiveLength = 500;
 
+    private NoMove noMove;
+    private Down down;
+    
     private Image bullet;
     
     public Game() {
@@ -39,8 +45,13 @@ public class Game : IGameEventProcessor<object> {
         score = new Score(new Vec2F(0.02f, 0.7f), new Vec2F(0.3f, 0.3f));
         enemyStrides = ImageStride.CreateStrides(4,
             Path.Combine("Assets", "Images", "BlueMonster.png"));
-        enemies = new List<Enemy>();
+        //enemies = new List<Enemy>();
+        squiggleSquadron = new SquiggleSquadron(6);
         AddEnemies();
+        
+         noMove = new NoMove();
+         down = new Down();
+         
         eventBus = new GameEventBus<object>();
         eventBus.InitializeEventBus(new List<GameEventType> {
             GameEventType.InputEvent,
@@ -51,8 +62,8 @@ public class Game : IGameEventProcessor<object> {
         eventBus.Subscribe(GameEventType.InputEvent, this);
         eventBus.Subscribe(GameEventType.WindowEvent, this);
         eventBus.Subscribe(GameEventType.MovementEvent, player);
+
         playerShots = new List<PlayerShot>();
-        
         // Preloads the bullet image
         bullet = new Image(Path.Combine("Assets", "Images", "BulletRed2.png"));
         explosionStrides = ImageStride.CreateStrides(8, Path.Combine("Assets", "Images", "Explosion.png"));
@@ -86,12 +97,18 @@ public class Game : IGameEventProcessor<object> {
                 {
                     shot.Image.Render(shot.Shape);
                 } 
-
+                
               // Render all enemy objects
-                foreach (var enemy in enemies)
+              down.MoveEnemies(squiggleSquadron.Enemies);
+              
+              squiggleSquadron.Enemies.RenderEntities();
+              /*
+              foreach (var enemy in enemies)
                 {
                     enemy.Image.Render(enemy.Shape);
                 }
+                */
+                
                 explosions.RenderAnimations();
                 win.SwapBuffers();
             }
@@ -171,11 +188,13 @@ public class Game : IGameEventProcessor<object> {
 
     private void AddEnemies()
     {
-        SquiggleSquadron squiggleSquadron = new SquiggleSquadron(6);
+        //SquiggleSquadron squiggleSquadron = new SquiggleSquadron(6);
         squiggleSquadron.CreateEnemies(enemyStrides);
+        /*
         foreach (Enemy enemy in squiggleSquadron.Enemies) {
             enemies.Add(enemy);
         }
+        */
     }
     
     public void IterateShot()
@@ -189,7 +208,7 @@ public class Game : IGameEventProcessor<object> {
             }
             else
             {
-                foreach (var enemy in enemies)
+                foreach (Enemy enemy in  squiggleSquadron.Enemies)
                 {
                     var collision = CollisionDetection.Aabb(shot.Shape.AsDynamicShape(),  enemy.Shape);
                     if (collision.Collision)
@@ -202,6 +221,8 @@ public class Game : IGameEventProcessor<object> {
                 }
             }
         }
+        
+        /*
         List<Enemy> newEnemies = new List<Enemy>();
         foreach (var enemy in enemies)
         {
@@ -211,6 +232,8 @@ public class Game : IGameEventProcessor<object> {
             }                       
         }
         enemies = newEnemies;
+        */
+        
         List<PlayerShot> newPlayerShots = new List<PlayerShot>();
         foreach (var shot in playerShots)
         {
