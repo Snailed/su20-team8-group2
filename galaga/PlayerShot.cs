@@ -8,8 +8,7 @@ namespace galaga
 {
     public class PlayerShot : Entity
     {
-        public PlayerShot(DynamicShape shape, IBaseImage image) : base(shape, image)
-        {
+        public PlayerShot(DynamicShape shape, IBaseImage image) : base(shape, image) {
         }
     }
 }

@@ -12,21 +12,22 @@ using galaga;
 using galaga.Squadron;
 using galaga.MovementStrategy;
 
-public class Game : IGameEventProcessor<object> {
+public class Game : IGameEventProcessor<object>
+{
     private readonly Window win;
 
     private readonly GameTimer gameTimer;
     private readonly Player player;
     private readonly GameEventBus<object> eventBus;
-    
-    
+
+
     private List<Image> enemyStrides;
     private readonly Score score;
 
     private List<PlayerShot> playerShots;
 
     private SquiggleSquadron squiggleSquadron;
-    
+
     private List<Image> explosionStrides;
     private AnimationContainer explosions;
     private int explosiveLength = 500;
@@ -34,14 +35,13 @@ public class Game : IGameEventProcessor<object> {
     private NoMove noMove;
     private Down down;
     private ZigZagDown zigZagDown;
-    
-    
+
+
     private Image bullet;
 
     private bool isGameOver;
-    
-    public Game()
-    {
+
+    public Game() {
         isGameOver = false;
         win = new Window("Galaga", 500, 500);
         gameTimer = new GameTimer(60, 60);
@@ -52,11 +52,11 @@ public class Game : IGameEventProcessor<object> {
             Path.Combine("Assets", "Images", "BlueMonster.png"));
         squiggleSquadron = new SquiggleSquadron(6);
         AddEnemies();
-        
-         noMove = new NoMove();
-         down = new Down();
-         zigZagDown = new ZigZagDown();
-         
+
+        noMove = new NoMove();
+        down = new Down();
+        zigZagDown = new ZigZagDown();
+
         eventBus = new GameEventBus<object>();
         eventBus.InitializeEventBus(new List<GameEventType> {
             GameEventType.InputEvent,
@@ -85,20 +85,19 @@ public class Game : IGameEventProcessor<object> {
                 win.PollEvents();
                 // Update game logic here 
                 player.Move();
-                
+
                 // Check if enemy has won
                 squiggleSquadron.Enemies.Iterate(CheckIfEnemyHasWon);
-                
+
                 // See if difficulty should be increased and enemies created
-                if (!isGameOver && squiggleSquadron.Enemies.CountEntities() <= 0)
-                {
+                if (!isGameOver && squiggleSquadron.Enemies.CountEntities() <= 0) {
                     zigZagDown.IncreaseSpeedBy(0.0001f);
                     AddEnemies();
                 }
-                
+
                 // Moves the shot
                 IterateShot();
-                
+
                 eventBus.ProcessEvents();
             }
 
@@ -111,17 +110,16 @@ public class Game : IGameEventProcessor<object> {
                     player.Entity.RenderEntity();
                 score.RenderScore();
 
-                foreach (var shot in playerShots)
-                {
+                foreach (var shot in playerShots) {
                     shot.Image.Render(shot.Shape);
-                } 
-                
-              // Render all enemy objects
-              zigZagDown.MoveEnemies(squiggleSquadron.Enemies);
-              squiggleSquadron.Enemies.RenderEntities();
-              
-              explosions.RenderAnimations();
-              win.SwapBuffers();
+                }
+
+                // Render all enemy objects
+                zigZagDown.MoveEnemies(squiggleSquadron.Enemies);
+                squiggleSquadron.Enemies.RenderEntities();
+
+                explosions.RenderAnimations();
+                win.SwapBuffers();
             }
 
             if (gameTimer.ShouldReset()) // 1 second has passed - display last captured ups and fps
@@ -141,7 +139,7 @@ public class Game : IGameEventProcessor<object> {
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
                         "MOVE_RIGHT", "", ""));
                 break;
-            case "KEY_L" :
+            case "KEY_L":
                 eventBus.RegisterEvent(
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
                         "MOVE_LEFT", "", ""));
@@ -149,13 +147,12 @@ public class Game : IGameEventProcessor<object> {
             case "KEY_SPACE":
                 playerShots.Add(new PlayerShot(
                     new DynamicShape(
-                        new Vec2F(player.Entity.Shape.Position.X +0.05f, player.Entity.Shape.Position.Y + 0.1f),
+                        new Vec2F(player.Entity.Shape.Position.X + 0.05f, player.Entity.Shape.Position.Y + 0.1f),
                         new Vec2F(0.008f, 0.027f),
                         new Vec2F(0.0f, 0.01f)
                     ),
                     bullet));
                 break;
-                
         }
     }
 
@@ -166,12 +163,11 @@ public class Game : IGameEventProcessor<object> {
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
                         "MOVE_STOP", "", ""));
                 break;
-            case "KEY_L" :
+            case "KEY_L":
                 eventBus.RegisterEvent(
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
                         "MOVE_STOP", "", ""));
                 break;
-            
         }
     }
 
@@ -197,18 +193,15 @@ public class Game : IGameEventProcessor<object> {
 
     // Check if enemy has won by checking if enemy input
     // has reached the bottom of the screen, Position.Y <= 0
-    private void CheckIfEnemyHasWon(Enemy enemy)
-    {
-        if (enemy.Shape.Position.Y <= 0)
-        {
+    private void CheckIfEnemyHasWon(Enemy enemy) {
+        if (enemy.Shape.Position.Y <= 0) {
             eventBus.RegisterEvent(
                 GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.StatusEvent, this,
                     "GAME_OVER", "", ""));
         }
     }
 
-    private void GameOver()
-    {
+    private void GameOver() {
         isGameOver = true;
         // Remove all objects in squiggleSquadron and playerShots
         // so that none are rendered
@@ -216,28 +209,22 @@ public class Game : IGameEventProcessor<object> {
         playerShots.Clear();
     }
 
-    private void AddEnemies()
-    {
+    private void AddEnemies() {
         squiggleSquadron.CreateEnemies(enemyStrides);
     }
-    
-    public void IterateShot()
-    {
-        foreach (var shot in playerShots)
-        {
+
+    public void IterateShot() {
+        foreach (var shot in playerShots) {
             shot.Shape.Move();
-            if (shot.Shape.Position.Y > 1.0f )
-            {
+            if (shot.Shape.Position.Y > 1.0f) {
                 shot.DeleteEntity();
             }
-            else
-            {
-                foreach (Enemy enemy in  squiggleSquadron.Enemies)
-                {
-                    var collision = CollisionDetection.Aabb(shot.Shape.AsDynamicShape(),  enemy.Shape);
-                    if (collision.Collision)
-                    {
-                        AddExplosion(enemy.Shape.Position.X, enemy.Shape.Position.Y, enemy.Shape.Extent.X, enemy.Shape.Extent.Y);
+            else {
+                foreach (Enemy enemy in squiggleSquadron.Enemies) {
+                    var collision = CollisionDetection.Aabb(shot.Shape.AsDynamicShape(), enemy.Shape);
+                    if (collision.Collision) {
+                        AddExplosion(enemy.Shape.Position.X, enemy.Shape.Position.Y, enemy.Shape.Extent.X,
+                            enemy.Shape.Extent.Y);
                         enemy.DeleteEntity();
                         shot.DeleteEntity();
                         score.AddPoint(1);
@@ -245,22 +232,19 @@ public class Game : IGameEventProcessor<object> {
                 }
             }
         }
-        
+
         List<PlayerShot> newPlayerShots = new List<PlayerShot>();
-        foreach (var shot in playerShots)
-        {
-            if (!shot.IsDeleted())
-            {
+        foreach (var shot in playerShots) {
+            if (!shot.IsDeleted()) {
                 newPlayerShots.Add(shot);
             }
         }
+
         playerShots = newPlayerShots;
     }
 
-    public void AddExplosion(float posX, float posY, float extentX, float extentY)
-    {
+    public void AddExplosion(float posX, float posY, float extentX, float extentY) {
         explosions.AddAnimation(new StationaryShape(posX, posY, extentX, extentY), explosiveLength,
             new ImageStride(explosiveLength / 8, explosionStrides));
-        
     }
 }
