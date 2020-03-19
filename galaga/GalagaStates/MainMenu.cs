@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using DIKUArcade.Entities;
 using DIKUArcade.EventBus;
 using DIKUArcade.Graphics;
@@ -16,74 +17,56 @@ namespace galaga.GalagaStates
         private Text[] menuButtons;
         private int activeMenuButton;
         private int maxMenuButtons;
-        private bool enterPressed;
+
 
         public MainMenu (){
             InitializeGameState();
+            
         }
+        
 
         public static MainMenu GetInstance()
         {
-            return MainMenu.instance  ?? (MainMenu.instance = new MainMenu());
+            return MainMenu.instance ?? (MainMenu.instance = new MainMenu());
         }
 
         public void GameLoop()
         {
-            if (enterPressed)
-            {
-                switch (activeMenuButton)
-                {
-                    case 0:
-                        GalagaBus.GetBus().RegisterEvent(GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.GameStateEvent, 
-                            this, "CHANGE_STATE", "GAME_RUNNING", ""));
-                        break;
-                    case 1:
-                        GalagaBus.GetBus().RegisterEvent(
-                            GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.WindowEvent, this,
-                                "CLOSE_WINDOW", "", ""));
-                        break;
-                }
-            }        
+            throw new NotImplementedException();
         }
 
         public void InitializeGameState()
         {
             var path = Path.Combine("Assets", "Images", "TitleImage.png");
-            
-            backGroundImage = new Entity(new StationaryShape(new Vec2F(0.250f, 0.250f), new Vec2F(0.500f, 0.500f)), new Image(Path.Combine("../", path)));
+            Console.WriteLine("menu1");
+
+            backGroundImage = new Entity(new StationaryShape(new Vec2F(0.0f, 0.0f), new Vec2F(1.0f, 1.0f)), new Image(path));
+    
             menuButtons = new Text[]
             {
-                new Text("New game", new Vec2F(0.2f, 0.2f), new Vec2F(0.3f, 0.3f)),
-                new Text("Quit", new Vec2F(0.2f, 0.2f), new Vec2F(0.3f, 0.3f)),
-
+                new Text("New game", new Vec2F(0.2f, 0.6f), new Vec2F(0.3f, 0.3f)),
+                new Text("Quit", new Vec2F(0.2f, 0.3f), new Vec2F(0.3f, 0.3f))
+            
             };
-            enterPressed = false;
+            
+            
+            Console.WriteLine("menu2");
+
+            activeMenuButton = 0;
         }
 
         public void UpdateGameLogic()
         {
-            if (enterPressed)
-            {
-                switch (activeMenuButton)
-                {
-                    case 0:
-                        GalagaBus.GetBus().RegisterEvent(GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.GameStateEvent, 
-                            this, "CHANGE_STATE", "GAME_RUNNING", ""));
-                        break;
-                    case 1:
-                        GalagaBus.GetBus().RegisterEvent(
-                            GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.WindowEvent, this,
-                                "CLOSE_WINDOW", "", ""));
-                       break;
-                }
-            }
+            
         }
 
         public void RenderState()
         {
+
+            
             backGroundImage.RenderEntity();
            
-            for (int i = 0; i < menuButtons.Length -1; i++)
+            for (int i = 0; i <= menuButtons.Length -1; i++)
             {
                 if (i == activeMenuButton)
                 {
@@ -96,6 +79,7 @@ namespace galaga.GalagaStates
                 }
                 menuButtons[i].RenderText();
             }
+            
         }
 
         public void HandleKeyEvent(string keyValue, string keyAction)
@@ -111,10 +95,24 @@ namespace galaga.GalagaStates
                         activeMenuButton = 1;
                         break;
                     case "KEY_ENTER":
-                        enterPressed = true;
+                        Enter();
                         break;
                 }
             }
         }
+        public void Enter(){
+                switch (activeMenuButton)
+                {
+                    case 0:
+                        GalagaBus.GetBus().RegisterEvent(GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.GameStateEvent, 
+                            this, "CHANGE_STATE", "GAME_RUNNING", ""));
+                        break;
+                    case 1:
+                        GalagaBus.GetBus().RegisterEvent(
+                            GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.WindowEvent, this,
+                                "CLOSE_WINDOW", "", ""));
+                       break;
+            }
+        } 
     }
 }
