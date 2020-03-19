@@ -9,7 +9,7 @@ namespace galaga.GalagaStates {
             GalagaBus.GetBus().Subscribe(GameEventType.InputEvent, this);
             Console.WriteLine("State 1");
             ActiveState = MainMenu.GetInstance();
-            ActiveState.InitializeGameState();
+            //ActiveState.InitializeGameState();
             Console.WriteLine("State 2");
         }
         private void SwitchState(GameStateType stateType) {
