@@ -11,16 +11,20 @@ using DIKUArcade.Timers;
 using galaga;
 using galaga.Squadron;
 using galaga.MovementStrategy;
+using galaga.GalagaStates;
 
 public class Game : IGameEventProcessor<object>
 {
+    
     private readonly Window win;
 
+    private StateMachine stateMachine;
+    
     private readonly GameTimer gameTimer;
     private readonly Player player;
     private readonly GameEventBus<object> eventBus;
 
-
+  
     private List<Image> enemyStrides;
     private readonly Score score;
 
@@ -42,6 +46,10 @@ public class Game : IGameEventProcessor<object>
     private bool isGameOver;
 
     public Game() {
+        //GalagaBus.GetBus();
+
+        //MainMenu.GetInstance().InitializeGameState();
+        //stateMachine = new StateMachine();
         isGameOver = false;
         win = new Window("Galaga", 500, 500);
         gameTimer = new GameTimer(60, 60);
@@ -57,18 +65,18 @@ public class Game : IGameEventProcessor<object>
         down = new Down();
         zigZagDown = new ZigZagDown();
 
-        eventBus = new GameEventBus<object>();
-        eventBus.InitializeEventBus(new List<GameEventType> {
+        //eventBus = new GameEventBus<object>();
+        GalagaBus.GetBus().InitializeEventBus(new List<GameEventType> {
             GameEventType.InputEvent,
             GameEventType.WindowEvent,
             GameEventType.MovementEvent,
             GameEventType.StatusEvent
         });
-        win.RegisterEventBus(eventBus);
-        eventBus.Subscribe(GameEventType.InputEvent, this);
-        eventBus.Subscribe(GameEventType.WindowEvent, this);
-        eventBus.Subscribe(GameEventType.MovementEvent, player);
-        eventBus.Subscribe(GameEventType.StatusEvent, this);
+        win.RegisterEventBus(GalagaBus.GetBus());
+        GalagaBus.GetBus().Subscribe(GameEventType.InputEvent, this);
+        GalagaBus.GetBus().Subscribe(GameEventType.WindowEvent, this);
+        GalagaBus.GetBus().Subscribe(GameEventType.MovementEvent, player);
+        GalagaBus.GetBus().Subscribe(GameEventType.StatusEvent, this);
 
         playerShots = new List<PlayerShot>();
         // Preloads the bullet image
@@ -77,15 +85,36 @@ public class Game : IGameEventProcessor<object>
         // Here the constructor is given the argument 6 since that is the total amount of enemies.  
         explosions = new AnimationContainer(6);
     }
-
+    /*
     public void GameLoop() {
         while (win.IsRunning()) {
             gameTimer.MeasureTime();
             while (gameTimer.ShouldUpdate()) {
                 win.PollEvents();
+                GalagaBus.GetBus().ProcessEvents();
+                stateMachine.ActiveState.UpdateGameLogic();
+            }
+            if (gameTimer.ShouldRender()) {
+                win.Clear();
+                stateMachine.ActiveState.RenderState();
+                win.SwapBuffers();
+            }
+            if (gameTimer.ShouldReset()) {
+                win.Title = "Galaga | UPS: " + gameTimer.CapturedUpdates + ", FPS: " + gameTimer.CapturedFrames;
+        }
+    }
+}
+*/
+    
+    public void GameLoop() {
+        while (win.IsRunning()) {
+            gameTimer.MeasureTime();
+            while (gameTimer.ShouldUpdate()) {
+
+                
+                win.PollEvents();
                 // Update game logic here 
                 player.Move();
-
                 // Check if enemy has won
                 squiggleSquadron.Enemies.Iterate(CheckIfEnemyHasWon);
 
@@ -97,11 +126,8 @@ public class Game : IGameEventProcessor<object>
 
                 // Moves the shot
                 IterateShot();
-
-                eventBus.ProcessEvents();
+                GalagaBus.GetBus().ProcessEvents();
             }
-
-
             if (gameTimer.ShouldRender()) {
                 win.Clear();
                 // Render gameplay entities here
@@ -117,30 +143,32 @@ public class Game : IGameEventProcessor<object>
                 // Render all enemy objects
                 zigZagDown.MoveEnemies(squiggleSquadron.Enemies);
                 squiggleSquadron.Enemies.RenderEntities();
-
                 explosions.RenderAnimations();
                 win.SwapBuffers();
+                        
             }
 
             if (gameTimer.ShouldReset()) // 1 second has passed - display last captured ups and fps
                 win.Title = "Galaga | UPS: " + gameTimer.CapturedUpdates + ", FPS: " + gameTimer.CapturedFrames;
         }
+
     }
+    
 
     public void KeyPress(string key) {
         switch (key) {
             case "KEY_ESCAPE":
-                eventBus.RegisterEvent(
+                GalagaBus.GetBus().RegisterEvent(
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.WindowEvent, this,
                         "CLOSE_WINDOW", "", ""));
                 break;
             case "KEY_H":
-                eventBus.RegisterEvent(
+                GalagaBus.GetBus().RegisterEvent(
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
                         "MOVE_RIGHT", "", ""));
                 break;
             case "KEY_L":
-                eventBus.RegisterEvent(
+                GalagaBus.GetBus().RegisterEvent(
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
                         "MOVE_LEFT", "", ""));
                 break;
@@ -159,12 +187,12 @@ public class Game : IGameEventProcessor<object>
     public void KeyRelease(string key) {
         switch (key) {
             case "KEY_H":
-                eventBus.RegisterEvent(
+                GalagaBus.GetBus().RegisterEvent(
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
                         "MOVE_STOP", "", ""));
                 break;
             case "KEY_L":
-                eventBus.RegisterEvent(
+                GalagaBus.GetBus().RegisterEvent(
                     GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.MovementEvent, this,
                         "MOVE_STOP", "", ""));
                 break;
@@ -195,7 +223,7 @@ public class Game : IGameEventProcessor<object>
     // has reached the bottom of the screen, Position.Y <= 0
     private void CheckIfEnemyHasWon(Enemy enemy) {
         if (enemy.Shape.Position.Y <= 0) {
-            eventBus.RegisterEvent(
+            GalagaBus.GetBus().RegisterEvent(
                 GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.StatusEvent, this,
                     "GAME_OVER", "", ""));
         }
