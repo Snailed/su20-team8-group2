@@ -18,6 +18,8 @@ public class Game : IGameEventProcessor<object>
     
     private readonly Window win;
 
+    private StateMachine stateMachine;
+    
     private readonly GameTimer gameTimer;
     private readonly Player player;
     private readonly GameEventBus<object> eventBus;
@@ -44,10 +46,10 @@ public class Game : IGameEventProcessor<object>
     private bool isGameOver;
 
     public Game() {
-        GalagaBus.GetBus();
+        //GalagaBus.GetBus();
 
-        MainMenu.GetInstance().InitializeGameState();
-        
+        //MainMenu.GetInstance().InitializeGameState();
+        //stateMachine = new StateMachine();
         isGameOver = false;
         win = new Window("Galaga", 500, 500);
         gameTimer = new GameTimer(60, 60);
@@ -83,21 +85,38 @@ public class Game : IGameEventProcessor<object>
         // Here the constructor is given the argument 6 since that is the total amount of enemies.  
         explosions = new AnimationContainer(6);
     }
-
+    /*
     public void GameLoop() {
         while (win.IsRunning()) {
-            
-            
             gameTimer.MeasureTime();
             while (gameTimer.ShouldUpdate()) {
+                win.PollEvents();
+                GalagaBus.GetBus().ProcessEvents();
+                stateMachine.ActiveState.UpdateGameLogic();
+            }
+            if (gameTimer.ShouldRender()) {
+                win.Clear();
+                stateMachine.ActiveState.RenderState();
+                win.SwapBuffers();
+            }
+            if (gameTimer.ShouldReset()) {
+                win.Title = "Galaga | UPS: " + gameTimer.CapturedUpdates + ", FPS: " + gameTimer.CapturedFrames;
+        }
+    }
+}
+*/
+    
+    public void GameLoop() {
+        while (win.IsRunning()) {
+            gameTimer.MeasureTime();
+            while (gameTimer.ShouldUpdate()) {
+
                 
                 win.PollEvents();
                 // Update game logic here 
-                /*
                 player.Move();
-
                 // Check if enemy has won
-                //squiggleSquadron.Enemies.Iterate(CheckIfEnemyHasWon);
+                squiggleSquadron.Enemies.Iterate(CheckIfEnemyHasWon);
 
                 // See if difficulty should be increased and enemies created
                 if (!isGameOver && squiggleSquadron.Enemies.CountEntities() <= 0) {
@@ -107,20 +126,12 @@ public class Game : IGameEventProcessor<object>
 
                 // Moves the shot
                 IterateShot();
-                */
-
                 GalagaBus.GetBus().ProcessEvents();
             }
-
-
             if (gameTimer.ShouldRender()) {
                 win.Clear();
-                
-                
                 // Render gameplay entities here
                 // Render player object if game is not over
-                
-                /*
                 if (!isGameOver)
                     player.Entity.RenderEntity();
                 score.RenderScore();
@@ -132,9 +143,7 @@ public class Game : IGameEventProcessor<object>
                 // Render all enemy objects
                 zigZagDown.MoveEnemies(squiggleSquadron.Enemies);
                 squiggleSquadron.Enemies.RenderEntities();
-
                 explosions.RenderAnimations();
-                */
                 win.SwapBuffers();
                         
             }
@@ -144,6 +153,7 @@ public class Game : IGameEventProcessor<object>
         }
 
     }
+    
 
     public void KeyPress(string key) {
         switch (key) {
