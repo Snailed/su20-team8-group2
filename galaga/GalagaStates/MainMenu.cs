@@ -18,14 +18,12 @@ namespace galaga.GalagaStates
         private int activeMenuButton;
         private int maxMenuButtons;
 
-/*
+
         public MainMenu (){
             InitializeGameState();
-            //var path = Path.Combine("..","Assets", "Images", "TitleImage.png");
-            //backGroundImage = new Entity(new StationaryShape(new Vec2F(0.250f, 0.250f), new Vec2F(0.500f, 0.500f)), new Image(path));
-
+            
         }
-        */
+        
 
         public static MainMenu GetInstance()
         {
@@ -39,15 +37,15 @@ namespace galaga.GalagaStates
 
         public void InitializeGameState()
         {
-            //var path = Path.Combine("..","Assets", "Images", "TitleImage.png");
+            var path = Path.Combine("Assets", "Images", "TitleImage.png");
             Console.WriteLine("menu1");
 
-            //backGroundImage = new Entity(new StationaryShape(new Vec2F(0.250f, 0.250f), new Vec2F(0.500f, 0.500f)), new Image(path));
+            backGroundImage = new Entity(new StationaryShape(new Vec2F(0.0f, 0.0f), new Vec2F(1.0f, 1.0f)), new Image(path));
     
             menuButtons = new Text[]
             {
-                new Text("New game", new Vec2F(0.2f, 0.2f), new Vec2F(0.3f, 0.3f)),
-                new Text("Quit", new Vec2F(0.2f, 0.2f), new Vec2F(0.3f, 0.3f))
+                new Text("New game", new Vec2F(0.2f, 0.6f), new Vec2F(0.3f, 0.3f)),
+                new Text("Quit", new Vec2F(0.2f, 0.3f), new Vec2F(0.3f, 0.3f))
             
             };
             
@@ -65,10 +63,10 @@ namespace galaga.GalagaStates
         public void RenderState()
         {
 
-            /*
-            //backGroundImage.RenderEntity();
+            
+            backGroundImage.RenderEntity();
            
-            for (int i = 0; i < menuButtons.Length -1; i++)
+            for (int i = 0; i <= menuButtons.Length -1; i++)
             {
                 if (i == activeMenuButton)
                 {
@@ -81,7 +79,7 @@ namespace galaga.GalagaStates
                 }
                 menuButtons[i].RenderText();
             }
-            */
+            
         }
 
         public void HandleKeyEvent(string keyValue, string keyAction)

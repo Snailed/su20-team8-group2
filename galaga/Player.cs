@@ -3,7 +3,7 @@ using DIKUArcade.Entities;
 using DIKUArcade.EventBus;
 using DIKUArcade.Graphics;
 using DIKUArcade.Math;
-
+using System;
 namespace galaga
 {
     public class Player : IGameEventProcessor<object>
@@ -22,12 +22,14 @@ namespace galaga
             if (eventType == GameEventType.MovementEvent) {
                 switch (gameEvent.Message) {
                     case "MOVE_RIGHT":
+                        Console.WriteLine("move1");
                         this.Direction(new Vec2F(-0.01f, 0.0f));
                         break;
                     case "MOVE_LEFT":
                         this.Direction(new Vec2F(0.01f, 0.0f));
                         break;
                     case "MOVE_STOP":
+                        Console.WriteLine("Stop");
                         this.Direction(new Vec2F(0.0f, 0.0f));
                         break;
                 }
@@ -46,6 +48,7 @@ namespace galaga
             if (x > 0 && x < 1) {
                 if (x + shape.Extent.X < 1 && y + shape.Extent.Y < 1) Entity.Shape.Move();
             }
+            Console.WriteLine(shape.Position);
         }
     }
 }
