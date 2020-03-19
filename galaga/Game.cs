@@ -49,7 +49,9 @@ public class Game : IGameEventProcessor<object>
         //GalagaBus.GetBus();
 
         //MainMenu.GetInstance().InitializeGameState();
-        //stateMachine = new StateMachine();
+        Console.WriteLine("test1");
+        stateMachine = new StateMachine();
+        Console.WriteLine("test2");
         isGameOver = false;
         win = new Window("Galaga", 500, 500);
         gameTimer = new GameTimer(60, 60);
@@ -105,13 +107,12 @@ public class Game : IGameEventProcessor<object>
     }
 }
 */
-    
+
+
     public void GameLoop() {
         while (win.IsRunning()) {
             gameTimer.MeasureTime();
             while (gameTimer.ShouldUpdate()) {
-
-                
                 win.PollEvents();
                 // Update game logic here 
                 player.Move();
@@ -153,7 +154,7 @@ public class Game : IGameEventProcessor<object>
         }
 
     }
-    
+
 
     public void KeyPress(string key) {
         switch (key) {
