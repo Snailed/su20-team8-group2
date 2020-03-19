@@ -1,15 +1,8 @@
+using System.Collections.Generic;
 using DIKUArcade.EventBus;
 using galaga;
 using galaga.GalagaStates;
 using NUnit.Framework;
-
-namespace galagaTests
-{
-    public class StateMachineTests
-    {
-        
-    }
-}
 
 namespace galagaTests {
     [TestFixture]
@@ -18,16 +11,14 @@ namespace galagaTests {
         [SetUp]
         public void InitiateStateMachine() {
             DIKUArcade.Window.CreateOpenGLContext();
-            /*
-            Here you should:
-            (1) Initialize a GalagaBus with proper GameEventTypes
-            (2) Instantiate the StateMachine
-            (3) Subscribe the GalagaBus to proper GameEventTypes
-            and GameEventProcessors
-            */
-            
+            GalagaBus.GetBus().InitializeEventBus(new List<GameEventType> {
+                GameEventType.InputEvent,
+                GameEventType.WindowEvent,
+                GameEventType.MovementEvent,
+                GameEventType.GameStateEvent
+            });
             stateMachine = new StateMachine();
-            
+            GalagaBus.GetBus().Subscribe(GameEventType.GameStateEvent, stateMachine);
         }
         [Test]
         public void TestInitialState() {
@@ -54,6 +45,16 @@ namespace galagaTests {
                 "GAME_RUNNING", ""));
             GalagaBus.GetBus().ProcessEventsSequentially();
             Assert.That(stateMachine.ActiveState, Is.InstanceOf<GameRunning>());
+        }
+        public void TestEventMainMenu() {
+            GalagaBus.GetBus().RegisterEvent(
+                GameEventFactory<object>.CreateGameEventForAllProcessors(
+                GameEventType.GameStateEvent,
+                this,
+                "CHANGE_STATE",
+                "MAIN_MENU", ""));
+            GalagaBus.GetBus().ProcessEventsSequentially();
+            Assert.That(stateMachine.ActiveState, Is.InstanceOf<MainMenu>());
         }
     }
 }
