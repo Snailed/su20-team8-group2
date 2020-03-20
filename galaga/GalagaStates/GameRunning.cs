@@ -19,10 +19,10 @@ namespace galaga.GalagaStates{
     {
         private static GameRunning instance = null;
 
-        private readonly Player player;
+        private  readonly Player player;
         private List<Image> enemyStrides;
 
-        private readonly Score score;
+        private  readonly Score score;
         private List<PlayerShot> playerShots;
         private SquiggleSquadron squiggleSquadron;
 
@@ -39,6 +39,7 @@ namespace galaga.GalagaStates{
     private Image bullet;
 
         public GameRunning(){
+
         isGameOver = false;
     
         player = new Player(new DynamicShape(new Vec2F(0.45f, 0.1f), new Vec2F(0.1f, 0.1f)),
@@ -62,6 +63,7 @@ namespace galaga.GalagaStates{
         //backGroundImage = new Entity(new StationaryShape(new Vec2F(0.2f, 0.2f), new Vec2F(0.5f, 0.5f)), new Image("Assets/Images/TitleImage.png"));
         GalagaBus.GetBus().Subscribe(GameEventType.MovementEvent, player);
 
+
         }
 
         public static GameRunning GetInstance()
@@ -75,6 +77,10 @@ namespace galaga.GalagaStates{
 
         public void InitializeGameState()
         {
+            player.Entity.Shape.SetPosition(new Vec2F(0.45f, 0.1f));
+            squiggleSquadron.Enemies.ClearContainer();
+            score.resetScore();
+            Console.WriteLine("GameRunning");
 
         }
 
@@ -143,6 +149,10 @@ namespace galaga.GalagaStates{
                                     new Vec2F(0.0f, 0.01f)
                                 ),
                                 bullet));
+                            break;
+                        case "KEY_P":
+                            GalagaBus.GetBus().RegisterEvent(GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.GameStateEvent, 
+                            this, "CHANGE_STATE", "GAME_PAUSED", ""));
                             break;
                             }
                     break;

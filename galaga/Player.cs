@@ -48,7 +48,6 @@ namespace galaga
             if (x > 0 && x < 1) {
                 if (x + shape.Extent.X < 1 && y + shape.Extent.Y < 1) Entity.Shape.Move();
             }
-            Console.WriteLine(shape.Position);
         }
     }
 }
