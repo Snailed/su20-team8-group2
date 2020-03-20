@@ -38,8 +38,6 @@ namespace galaga.GalagaStates
         public void InitializeGameState()
         {
             var path = Path.Combine("Assets", "Images", "TitleImage.png");
-            Console.WriteLine("menu1");
-
             backGroundImage = new Entity(new StationaryShape(new Vec2F(0.0f, 0.0f), new Vec2F(1.0f, 1.0f)), new Image(path));
     
             menuButtons = new Text[]
