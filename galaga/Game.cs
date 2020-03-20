@@ -40,6 +40,8 @@ public class Game : IGameEventProcessor<object>
         GalagaBus.GetBus().Subscribe(GameEventType.InputEvent, this);
         GalagaBus.GetBus().Subscribe(GameEventType.WindowEvent, this);
         GalagaBus.GetBus().Subscribe(GameEventType.StatusEvent, this);
+        GalagaBus.GetBus().Subscribe(GameEventType.GameStateEvent, this);
+
 
         stateMachine = new StateMachine();
 
@@ -75,7 +77,14 @@ public class Game : IGameEventProcessor<object>
         else if (eventType == GameEventType.InputEvent)
             
             stateMachine.ActiveState.HandleKeyEvent(gameEvent.Message, gameEvent.Parameter1);
-
+        else if (eventType == GameEventType.GameStateEvent){
+            if(gameEvent.Message == "CHANGE_STATE"){
+                if(gameEvent.Parameter1 == "GAME_RUNNING" && gameEvent.Parameter2 == "MAIN_MENU"){
+                stateMachine.ActiveState.InitializeGameState();
+                }
+            }
+        }
+            
     
     }
 }

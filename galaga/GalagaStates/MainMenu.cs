@@ -49,9 +49,6 @@ namespace galaga.GalagaStates
             
             };
             
-            
-            Console.WriteLine("menu2");
-
             activeMenuButton = 0;
         }
 
@@ -105,7 +102,7 @@ namespace galaga.GalagaStates
                 {
                     case 0:
                         GalagaBus.GetBus().RegisterEvent(GameEventFactory<object>.CreateGameEventForAllProcessors(GameEventType.GameStateEvent, 
-                            this, "CHANGE_STATE", "GAME_RUNNING", ""));
+                            this, "CHANGE_STATE", "GAME_RUNNING", "MAIN_MENU"));
                         break;
                     case 1:
                         GalagaBus.GetBus().RegisterEvent(
